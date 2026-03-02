@@ -6,8 +6,42 @@ def parse_labels(raw_text):
         for cell in line.split('\t'):
             cell = cell.strip()
             if cell:
-                items.append(cell)
+                expanded = expand_range(cell)
+                if expanded:
+                    items.extend(expanded)   # extend adds a whole list, append adds one item
+                else:
+                    for part in cell.split():
+                        items.append(part)
     return items
+
+def expand_range(token):
+    if " to " in token:
+        start, end = token.split(" to ")
+    elif " - " in token:
+        start, end = token.split(" - ")
+    else:
+        return None
+    
+    # extract prefix and number from start
+    i = len(start)
+    while i > 0 and start[i-1].isdigit():
+        i -= 1
+    start_prefix = start[:i]
+    start_num = int(start[i:])
+    
+    # extract prefix and number from end
+    j = len(end)
+    while j > 0 and end[j-1].isdigit():
+        j -= 1
+    end_prefix = end[:j]
+    end_num = int(end[j:])
+    
+    # make sure both sides share the same prefix
+    if start_prefix != end_prefix:
+        return None
+    
+    # generate every label in between
+    return [f"{start_prefix}{n}" for n in range(start_num, end_num + 1)]
 
 def shuffle(items):
     result = items.copy()
@@ -50,7 +84,7 @@ def build_sequence(ncs, pcs):
     return sequence
 
 if __name__ == "__main__":
-    nc_text = "NC-1\nNC-2\nNC-3\nNC-4"
+    nc_text = "NC-1 NC-2 NC-3"
     pc_text = "PC-A\nPC-B\nPC-C\nPC-D\nPC-E\nPC-F"
 
     ncs = parse_labels(nc_text)
@@ -66,3 +100,4 @@ if __name__ == "__main__":
         sequence = build_sequence(ncs, pcs)
         for i, item in enumerate(sequence):
             print(f"{i+1}. {item['label']}  ({item['type']})")
+
