@@ -112,5 +112,3 @@ if __name__ == "__main__":
         for i, item in enumerate(sequence):
             print(f"{i+1}. {item['label']}  ({item['type']})")
 
-
-
