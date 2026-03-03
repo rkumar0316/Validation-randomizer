@@ -2,25 +2,29 @@ import streamlit as st
 import pandas as pd
 from randomizer import parse_labels, validate, build_sequence
 
+OPT1 = "Option 1 — 1 Set 3 Lists"
+OPT2 = "Option 2 — 3 Sets 3 Lists"
+OPT3 = "Option 3 — 1 List"
+
 # --- configuration ---
 RUNS = [
-    {"id": "op1day1", "label": "Operator 1 — Day 1"},
-    {"id": "op1day2", "label": "Operator 1 — Day 2"},
-    {"id": "op2day1", "label": "Operator 2 — Day 1"},
+    {"id": "OpAD1", "label": "Operator A — Day 1"},
+    {"id": "OpAD2", "label": "Operator A — Day 2"},
+    {"id": "OpBD1", "label": "Operator B — Day 1"},
 ]
 
 METHOD_DESCRIPTIONS = {
-    "Option 1 — Shared Samples": "One NC/PC set → 3 independently randomized sequences",
-    "Option 2 — Separate Samples": "Enter a distinct NC/PC set for each run",
-    "Option 3 — Single List": "One NC/PC set → one randomized sequence",
+    OPT1: "One set of NC/PCs → 3 randomized lists (HVLD/VD)",
+    OPT2: "Three separate NC/PC sets → three separate randomized lists (HeLD)",
+    OPT3: "One NC/PC set → one randomized list (other use cases)",
 }
 st.set_page_config(
-    page_title="Validation Randomizer",
+    page_title="Validation Randomized List maker",
     page_icon="🧪",
     layout="centered"
 )
-st.title("Validation Randomized Sequence Generator")
-st.write("Evenly spaces positive controls between ordered negative controls")
+st.title("Validation Randomized List Generator")
+st.write("Evenly spaces positive controls while keeping negative controls. You can just paste your labels and press the button to have the list generated for you.")
 
 # --- dropdown ---
 method = st.selectbox("Test Method", list(METHOD_DESCRIPTIONS.keys()))
@@ -31,7 +35,7 @@ if "results" not in st.session_state:
     st.session_state.results = None
 
 # --- inputs ---
-if method == "Option 2 — Separate Samples":
+if method == OPT2:
     # show three separate input cards, one per run
     sets = []
     for run in RUNS:
@@ -57,15 +61,15 @@ else:
         
 # --- generate button ---
 button_labels = {
-    "Option 1 — Shared Samples": "Generate 3 Sequences",
-    "Option 2 — Separate Samples": "Generate All Sequences",
-    "Option 3 — Single List": "Generate Sequence",
+    OPT1: "Generate 3 Sequences",
+    OPT2: "Generate All Sequences",
+    OPT3: "Generate Sequence",
 }
 
 if st.button(button_labels[method], type="primary"):
     st.session_state.results = None
 
-    if method == "Option 2 — Separate Samples":
+    if method == OPT2:
         all_results = []
         error_found = False
 
@@ -87,7 +91,7 @@ if st.button(button_labels[method], type="primary"):
         if not error_found:
             st.session_state.results = all_results
 
-    elif method == "Option 3 — Single List":
+    elif method == OPT3:
         ncs = parse_labels(shared_nc)
         pcs = parse_labels(shared_pc)
         error = validate(ncs, pcs)
