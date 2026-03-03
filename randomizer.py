@@ -3,15 +3,26 @@ import random
 def parse_labels(raw_text):
     items = []
     for line in raw_text.splitlines():
-        for cell in line.split('\t'):
+        for cell in line.replace(',', ' ').split('\t'):
             cell = cell.strip()
-            if cell:
-                expanded = expand_range(cell)
-                if expanded:
-                    items.extend(expanded)   # extend adds a whole list, append adds one item
-                else:
-                    for part in cell.split():
-                        items.append(part)
+            if not cell:
+                continue
+            
+            # split into space separated tokens
+            tokens = cell.split()
+            i = 0
+            while i < len(tokens):
+                # check if this token and next two form a range (e.g. NC-1 to NC-5)
+                if i + 2 < len(tokens) and tokens[i+1].lower() in ("to", "-"):
+                    expanded = expand_range(f"{tokens[i]} {tokens[i+1]} {tokens[i+2]}")
+                    if expanded:
+                        items.extend(expanded)
+                        i += 3
+                        continue
+                # otherwise treat as a single label
+                if tokens[i].lower() not in ("to", "-"):
+                    items.append(tokens[i])
+                i += 1
     return items
 
 def expand_range(token):
