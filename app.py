@@ -10,7 +10,7 @@ RUNS = [
 ]
 
 METHOD_DESCRIPTIONS = {
-    "Option 1 — Shared Samples": "One NC/PC set → 3 independently randomized sequences",
+    "Option 1 — Poopy Samples": "One NC/PC set → 3 independently randomized sequences",
     "Option 2 — Separate Samples": "Enter a distinct NC/PC set for each run",
     "Option 3 — Single List": "One NC/PC set → one randomized sequence",
 }
